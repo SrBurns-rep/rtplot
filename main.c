@@ -18,12 +18,36 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
     int x0, x1, y0, y1;
 
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, bg);
+
+    for(size_t i = 0; i < ring->head; i++) {
+
+        if(i > 0) {
+            x0 = ((i - 1) * rect.width) / ring->size;
+            x1 = (i * rect.width) / ring->size;
+            x0 = rect.width - x0;
+            x1 = rect.width - x1;
+            x0 += rect.x;
+            x1 += rect.x;
+
+            // Invert Y axis
+            y0 = 1023 - ring->samples[i - 1].raw;
+            y1 = 1023 - ring->samples[i].raw;
+            y0 = (y0 * rect.height) / 1024;
+            y1 = (y1 * rect.height) / 1024;
+            y0 += rect.y;
+            y1 += rect.y;
+
+            DrawLine(x0, y0, x1, y1, fg);
+        }
+    }
     
     for(size_t i = ring->head; i < ring->size; i++) {
 
         if(i > ring->head + 1) {
             x0 = ((i - 1) * rect.width) / ring->size;
             x1 = (i * rect.width) / ring->size;
+            x0 = rect.width - x0;
+            x1 = rect.width - x1;
             x0 += rect.x;
             x1 += rect.x;
 
@@ -35,26 +59,6 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             y0 += rect.y;
             y1 += rect.y;
                         
-            DrawLine(x0, y0, x1, y1, fg);
-        }
-    }
-
-    for(size_t i = 0; i < ring->head; i++) {
-
-        if(i > 0) {
-            x0 = ((i - 1) * rect.width) / ring->size;
-            x1 = (i * rect.width) / ring->size;
-            x0 += rect.x;
-            x1 += rect.x;
-
-            // Invert Y axis
-            y0 = 1023 - ring->samples[i - 1].raw;
-            y1 = 1023 - ring->samples[i].raw;
-            y0 = (y0 * rect.height) / 1024;
-            y1 = (y1 * rect.height) / 1024;
-            y0 += rect.y;
-            y1 += rect.y;
-
             DrawLine(x0, y0, x1, y1, fg);
         }
     }
