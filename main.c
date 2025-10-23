@@ -15,11 +15,9 @@
 // how to plot this? 0 - 1023
 void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg) {
 
-
     int x0, x1, y0, y1;
 
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, bg);
-    
     
     for(size_t i = ring->head; i < ring->size; i++) {
 
@@ -28,9 +26,12 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             x1 = (i * rect.width) / ring->size;
             x0 += rect.x;
             x1 += rect.x;
-            
-            y0 = (ring->samples[i - 1].raw * rect.height) / 1024;
-            y1 = (ring->samples[i].raw * rect.height) / 1024;
+
+            // Invert Y axis
+            y0 = 1023 - ring->samples[i - 1].raw;
+            y1 = 1023 - ring->samples[i].raw;
+            y0 = (y0 * rect.height) / 1024;
+            y1 = (y1 * rect.height) / 1024;
             y0 += rect.y;
             y1 += rect.y;
                         
@@ -46,8 +47,11 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             x0 += rect.x;
             x1 += rect.x;
 
-            y0 = (ring->samples[i - 1].raw * rect.height) / 1024;
-            y1 = (ring->samples[i].raw * rect.height) / 1024;
+            // Invert Y axis
+            y0 = 1023 - ring->samples[i - 1].raw;
+            y1 = 1023 - ring->samples[i].raw;
+            y0 = (y0 * rect.height) / 1024;
+            y1 = (y1 * rect.height) / 1024;
             y0 += rect.y;
             y1 += rect.y;
 
