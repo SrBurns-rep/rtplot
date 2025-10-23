@@ -20,10 +20,10 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
 
     DrawRectangle(rect.x, rect.y, rect.width, rect.height, bg);
     
-
+    
     for(size_t i = ring->head; i < ring->size; i++) {
 
-        if(i > ring->head) {
+        if(i > ring->head + 1) {
             x0 = ((i - 1) * rect.width) / ring->size;
             x1 = (i * rect.width) / ring->size;
             x0 += rect.x;
@@ -95,6 +95,8 @@ int main(void) {
 		}
 		EndDrawing();
 	}
+
+	free(ring);
 	
 	CloseWindow();
 	return 0;	
