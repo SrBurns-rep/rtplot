@@ -16,7 +16,7 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
 
     int x0, x1, y0, y1;
 
-    DrawRectangle(rect.x, rect.y, rect.width, rect.height, bg);
+    DrawRectangle(rect.x - 1, rect.y, rect.width, rect.height + 1, bg);
 
     for(size_t i = 0; i < ring->head; i++) {
 
@@ -29,16 +29,19 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             x1 += rect.x;
 
             // Invert Y axis
-            y0 = 1024 - ring->samples[i - 1].raw;
-            y1 = 1024 - ring->samples[i].raw;
+            y0 = 1023 - ring->samples[i - 1].raw;
+            y1 = 1023 - ring->samples[i].raw;
             y0 = (y0 * rect.height) / 1024;
             y1 = (y1 * rect.height) / 1024;
             y0 += rect.y;
             y1 += rect.y;
 
-            DrawLine(x0, y0, x1, y1, BLUE);
+            DrawLine(x0, y0, x1, y1, fg);
         }
+        
     }
+
+    // TODO: fix gap in the middle of the plot
     
     for(size_t i = ring->head; i < ring->size; i++) {
 
@@ -51,8 +54,8 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             x1 += rect.x;
 
             // Invert Y axis
-            y0 = 1024 - ring->samples[i - 1].raw;
-            y1 = 1024 - ring->samples[i].raw;
+            y0 = 1023 - ring->samples[i - 1].raw;
+            y1 = 1023 - ring->samples[i].raw;
             y0 = (y0 * rect.height) / 1024;
             y1 = (y1 * rect.height) / 1024;
             y0 += rect.y;
@@ -62,7 +65,8 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
         }
     }
 
-    //DrawCircle((((ring->size - ring->head) * rect.width) / ring->size) + rect.x, (512 * rect.height / 1024) + rect.y, 4, RED);
+    // DEBUG head posigion:
+    DrawCircle((((ring->size - ring->head) * rect.width) / ring->size) + rect.x, (512 * rect.height / 1024) + rect.y, 2, RED);
     
 }
 
@@ -77,6 +81,8 @@ int main(void) {
 
 	SetTargetFPS(10);
 
+    srand((unsigned int)(ring));
+
 	int i = 0;
 
 	while(!WindowShouldClose()) {
@@ -84,7 +90,9 @@ int main(void) {
         i++;
 
         Sample s = {0};
-        s.raw = (int)(1022/2) * sin((float)i*M_PI/50.f) + (1022/2);
+
+        s.raw = (int)(1000/2) * sin((float)i*M_PI/50.f) + (1000/2) + (rand() % 20);
+        
         s.is_valid = 1;
         
         ring_push_sample(ring, s);
