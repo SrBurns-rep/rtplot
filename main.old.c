@@ -20,6 +20,13 @@ int main(void) {
 		exit(EXIT_FAILURE);
 	}
 
+    char buff[256] = {0};
+
+    char *device, *baud;
+
+    snprintf(buff, "stty -F %s %s cs8 -cstopb -parity -icanon min 1 time 1", device, baud);
+
+    //            \/ open and use this device                   
 	system("stty -F /dev/ttyUSB0 115200 cs8 -cstopb -parity -icanon min 1 time 1");
 
 	InitWindow(screenWidth, screenHeight, "Move block with esp32");

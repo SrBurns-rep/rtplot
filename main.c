@@ -11,6 +11,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#define ARRLEN(X) (sizeof(X)/sizeof((X)[0]))
+
 #define BUFFLEN 256
 
 void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg) {
@@ -47,8 +49,6 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             }
         }
     }
-
-    // TODO: fix gap in the middle of the plot
     
     for(size_t i = ring->head; i < ring->size; i++) {
 
@@ -82,18 +82,27 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
 
 int main(void) {
 
-    SampleRing *ring = ring_init(100);
+    Color bg_plot_color = (Color) {0x2C, 0x2C, 0x2C, 0xFF};
+    Color bg_color =      (Color) {0x33, 0x33, 0x33, 0xFF};
+
+    SampleRing *ring = ring_init(500);
 
 	const int screenWidth = 800;
 	const int screenHeight = 450;
 
 	InitWindow(screenWidth, screenHeight, "plot sine");
 
-	SetTargetFPS(10);
+	SetTargetFPS(60);
 
     srand(time(0));
 
 	int i = 0;
+
+	int vals[1000] = {0};
+
+	for(size_t j = 0; j < ARRLEN(vals); j++) {
+	    vals[j] = j;
+	}
 
 	while(!WindowShouldClose()) {
 
@@ -101,7 +110,9 @@ int main(void) {
 
         Sample s = {0};
 
-        s.raw = (int)(1000/2) * sin((float)i*M_PI/50.f) + (1000/2) + (rand() % 20);
+        // s.raw = (int)(600/2) * asinf(sinf((float)i*M_PI/50.f)) + (1000/2);
+
+        s.raw = vals[i % ARRLEN(vals)];
         
         s.is_valid = 1;
         
@@ -116,8 +127,8 @@ int main(void) {
 
 		BeginDrawing();
 		{
-			ClearBackground(RED);
-		    draw_ring_plot_samples(ring, rect, BLACK, RAYWHITE);
+			ClearBackground(bg_color);
+		    draw_ring_plot_samples(ring, rect, bg_plot_color, RAYWHITE);
 		}
 		EndDrawing();
 	}
