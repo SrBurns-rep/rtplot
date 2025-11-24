@@ -2,6 +2,7 @@
 #include "ring.h"
 
 #include <math.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,9 @@
 
 void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg) {
 
-    int x0, x1, y0, y1;
+    int x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+
+    int xt = 0, yt = 0;
 
     DrawRectangle(rect.x - 1, rect.y, rect.width, rect.height + 1, bg);
 
@@ -37,8 +40,12 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
             y1 += rect.y;
 
             DrawLine(x0, y0, x1, y1, fg);
+
+            if(i == 1) {
+                xt = x0;
+                yt = y0;
+            }
         }
-        
     }
 
     // TODO: fix gap in the middle of the plot
@@ -65,8 +72,11 @@ void draw_ring_plot_samples(SampleRing *ring, Rectangle rect, Color bg, Color fg
         }
     }
 
-    // DEBUG head posigion:
-    DrawCircle((((ring->size - ring->head) * rect.width) / ring->size) + rect.x, (512 * rect.height / 1024) + rect.y, 2, RED);
+    float dist = sqrt((xt - x1) * (xt - x1) + (yt - y1) * (yt - y1));
+
+    if(dist <= rect.height) {
+        DrawLine(xt, yt, x1, y1, fg);    
+    }
     
 }
 
@@ -81,7 +91,7 @@ int main(void) {
 
 	SetTargetFPS(10);
 
-    srand((unsigned int)(ring));
+    srand(time(0));
 
 	int i = 0;
 
