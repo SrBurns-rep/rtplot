@@ -2,8 +2,9 @@
 #include "ring.h"
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -241,8 +242,8 @@ int main(int argc, char **argv) {
     }
 
     snprintf(buf, ARRLEN(buf),
-        "stty -F %s %s cs8 -cstopb -parity -icanon min 1 time 1",
-        args.device,
+        "stty -F %s %d cs8 -cstopb -parity -icanon min 1 time 1",
+        args.path,
         args.baudrate
     );
 
@@ -279,25 +280,26 @@ int main(int argc, char **argv) {
         if(n_read > 0) {
             // Trim \r\n
             for(size_t i = read_buf_len - 1; i >= 0; --i) {
-                if( (read_buf[i] >= 0 && read_buf <= 9)
-                    || read_buf[i] == '-' 
-                    || read_buf[i] == '+') break;
+                if((read_buf[i] >= 0 && read_buf[i] <= 9)) break;
 
                 if(read_buf[i] == '\r') read_buf[i] = '\0';
                 if(read_buf[i] == '\n') read_buf[i] = '\0';
             }
 
-            s.raw = atoi(read_buf);
-            s.is_valid = 1;
+            int cur_val = atoi(read_buf);
 
-            ring_push_sample(ring, s);    
+            if(cur_val >= 0) {
+                s.raw = atoi(read_buf);
+                s.is_valid = 1;
+                ring_push_sample(ring, s);
+            }
         }
 
         Rectangle rect = {
             .width = 600,
             .height = 300,
-            .x = (screenWidth - 600) / 2,
-            .y = (screenHeight - 300) / 2
+            .x = (screen_width - 600) / 2,
+            .y = (screen_height - 300) / 2
             };
 
 		BeginDrawing();
