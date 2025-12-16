@@ -211,6 +211,12 @@ int main(int argc, char **argv) {
     //rtplot -b 115200 -d /dev/ttyACM0 
     //  0     1  2      3   4
 
+    if(argc < 2) {
+        print_help();
+        print_err("Not enough argumens, baudrate and device path are required.\n");
+        return -1;
+    }
+
     if(strcmp(argv[1], "-h") == 0) {
         print_help();
         return 0;
@@ -272,7 +278,7 @@ int main(int argc, char **argv) {
 
         char read_buf[BUFF_LEN_DEV] = {0};
 
-        size_t n_read = read(device_fd, read_buf, BUFF_LEN_DEV - 1);
+        int n_read = read(device_fd, read_buf, BUFF_LEN_DEV - 1);
 
         size_t read_buf_len = strlen(read_buf);
         Sample s = {0};
